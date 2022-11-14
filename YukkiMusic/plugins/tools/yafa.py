@@ -6,15 +6,12 @@ from gpytranslate import Translator
 from aiohttp import ClientSession
 from pyrogram import filters, Client
 import re
-import config
-from config import (YAFA_NAME, YAFA_CHANNEL, SUDO_USER,
-                    START_IMG_URL, BOT_USERNAME)
 from pyrogram.types import (InlineKeyboardButton,
                             InlineKeyboardMarkup, Message)
 from telegraph import upload_file
 from traceback import format_exc
 from YukkiMusic import app
-from typing import Union
+
 
 @app.on_message(command(["ترجمة","/tr"]))
 async def tr(_, message):
@@ -121,85 +118,14 @@ async def telegraph(client, message):
         await message.reply(f"**الرابط »**\n`https://telegra.ph{response[0]}`",disable_web_page_preview=True,reply_markup=button_s)
     finally:
         os.remove(download_location)
+
+
+@app.on_message(command(["الرابط","/link"]) & ~filters.bot & ~filters.private)
+async def invitelink(client, message):
+    chid = message.chat.id
+    try:
+        invitelink = await client.export_chat_invite_link(chid)
+    except:
+        return await message.reply_text("قم برفعي مسؤول في المجموعة أولا ؟")
+    await message.reply_text(f"**تم إنشاء رابط الدعوة بنجاح :**\n {invitelink}")
     
-@app.on_message(command(["كول"])
-    & filters.group
-    & ~filters.channel
-    & ~filters.edited
-)
-def echo(client, msg):
-    text = msg.text.split(None, 1)[1]
-    msg.reply(text)
-    
-    
-@app.on_message(command(["الاوامر"])
-    & filters.group
-    & ~filters.edited
-)
-@app.on_message(command(["الاوامر"])
-    & filters.channel
-    & ~filters.edited
-)
-async def ahmad(client: Client, message: Message): 
-  await message.reply_photo(
-    photo=config.START_IMG_URL,
-    caption=f"""**‹ اليك أوامر بوت الميوزك ›**
-    
-◇︰تشغيل أو شغل : لبدء تشغيل الاغاني 
-◇︰بنك : لقياس سرعة النت في البوت
-◇︰أوامر القناة : قناه + أسم الأغنية 
-◇︰وقف او مؤقت : لكتم الأغنية الحالية
-◇︰كمل : لألغاء كتم الأغنبة الحالية
-◇︰تخطي : لتخطي الأغنية الحالية
-◇︰أمر التحميل : تحميل + اسم الاغنية 
-◇︰غنيلي : لاختيار اغنية عشوائية
-◇︰انهاء : لايقاف تشغيل الأغنية الحالية
-◇︰كول + الكلام : للتلكم بلبوت
-◇︰طباعة : بالرد على نص لطباعته
-◇︰ترجمة : بالرد على نص + en او ar
-◇︰ميديا : بالرد على صورة او ملصق
-◇︰ملاحظة : أمر التشغيل في القنوات 👇:
-◇︰اضف البوت الى قناتك ثم أرسل 👇:
-◇︰قناة أو قناه + أسم الاغنية التي تريدها
-◇︰يمكنك استخدام أمر التحميل في القنوات""",
-        reply_markup=InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton(f"{YAFA_NAME} ›", url=f"{YAFA_CHANNEL}"),
-                ],[
-                InlineKeyboardButton(f"‹ أضفني الى قناتك ›", url=f"https://t.me/{BOT_USERNAME}?startchannel=true"),
-                ],[
-                InlineKeyboardButton("‹ أضفني الى مجموعتك ›", url=f"https://t.me/{BOT_USERNAME}?startgroup=true"),
-                ]
-            ]
-        ),
-    )
-    
-@app.on_message(command(["سورس","السورس","المطور","المبرمج"])
-    & filters.group
-    & ~filters.edited
-)
-@app.on_message(command(["سورس","السورس","المطور","المبرمج"])
-    & filters.channel
-    & ~filters.edited
-)
-async def ahmad(client: Client, message: Message):
-    await message.reply_photo(
-        photo=config.START_IMG_URL,
-        caption=f"""**‹ Welcome to the Music Source ›**""",
-        reply_markup=InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton("‹ المطور ›", url=f"{SUDO_USER}",
-                ),
-                InlineKeyboardButton(f"‹ السورس ›", url=f"{YAFA_CHANNEL}",
-                ),
-            ],
-            [
-                InlineKeyboardButton("‹ أضفني لمجموعتك ›", url=f"https://t.me/{BOT_USERNAME}?startgroup=true",
-                ),
-                InlineKeyboardButton("‹ أضفني لقناتك ›", url=f"https://t.me/{BOT_USERNAME}?startchannel=true",),
-                ]
-            ]
-        ),
-    )
